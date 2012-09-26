@@ -1,0 +1,93 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>Google Maps Basic</title>
+	<style>
+		#map { height: 600px; width:900px; margin:0 auto;
+		}
+	</style>
+	<meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+</head>
+<body>
+
+<div style="margin:10px; text-align:center;">
+	<input type="text" id="search-term" style="width:300px;" />
+	<input type="button" id="search" value="search" />
+</div>
+<div id="map"></div>
+<div style="margin:10px; text-align:center;">
+	Lat: <input type="text" id="lat" />
+	Long: <input type="text" id="lng" />
+</div>
+
+<div id="map"></div>
+<script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+<script>
+// detect if the geolocation object exists on navigator, 
+// or in other words, if the browser has the geolocation feature
+(function(){
+var myPosition;
+if (navigator.geolocation) {
+
+		console.log('Geolocation is supported by this browser');
+		navigator.geolocation.getCurrentPosition(function(position) {
+			myPosition = position;
+			//console.log(myPosition);
+			logPosition(myPosition);
+			//console.log(position.coords.latitude, position.coords.longitude);
+	});
+	} else {
+		console.log('Geolocation is not supported in your browser.');
+	}	
+
+	function logPosition() {
+		var center;
+		var myOptions;
+		var map;
+		var marker;
+		var geocoder;
+		var infowindow;
+
+ 		var image = "http://www.google.com/gmm/images/blue_dot_circle.png";
+
+		center 		= new google.maps.LatLng( myPosition.coords.latitude, myPosition.coords.longitude);		
+		myOptions 	= {
+			zoom: 15,
+			center : center,
+			mapTypeId: google.maps.MapTypeId.SATELLITE
+		};
+
+		map 		= new google.maps.Map(document.getElementById('map'), myOptions)
+		marker 		= new google.maps.Marker({
+			map:map,
+	    	draggable:true,
+	    	animation: google.maps.Animation.DROP,
+			position: center,
+			title: 'Current Location',
+			icon: image
+		});
+		findAddress(center, map, marker);
+		
+		function findAddress(){
+			geocoder 	= new google.maps.Geocoder();
+			infowindow 	= new google.maps.InfoWindow();
+
+			geocoder.geocode({ location : center}, function(results, status) {
+			    if (status == google.maps.GeocoderStatus.OK) {
+			     if (results[0]) {
+			        infowindow.setContent(results[0].formatted_address);
+			        infowindow.open(map, marker);
+			      }
+			   	} else {
+			        alert("Geocoder failed due to: " + status);
+			    }
+			});
+		}
+	};
+})();
+</script>
+
+</body>
+</html>
